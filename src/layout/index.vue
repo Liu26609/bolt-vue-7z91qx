@@ -23,7 +23,7 @@ const handleSelect = (index: string) => {
       >
         <el-menu-item v-for="route in routes" :key="route.path" :index="route.path">
           <el-icon>
-            <component :is="Icons[route.meta?.icon]" />
+            <component :is="Icons[route.meta?.icon as keyof typeof Icons]" />
           </el-icon>
           <span>{{ route.meta?.title }}</span>
         </el-menu-item>

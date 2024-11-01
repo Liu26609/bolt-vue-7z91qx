@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import 'emoji-picker-element'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 
 interface ItemData {
   id: string
@@ -29,7 +28,6 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('添加道具')
 const formRef = ref<FormInstance>()
 const isEdit = ref(false)
-const showEmojiPicker = ref(false)
 
 const formData = reactive({
   id: '',
@@ -43,7 +41,7 @@ const rules = reactive<FormRules>({
     { required: true, message: '请输入道具名称', trigger: 'blur' }
   ],
   icon: [
-    { required: true, message: '请选择表情', trigger: 'change' }
+    { required: true, message: '请输入emoji样式', trigger: 'blur' }
   ],
   value: [
     { required: true, message: '请输入出售价格', trigger: 'blur' },
@@ -93,19 +91,14 @@ const handleDelete = (index: number) => {
   })
 }
 
-const handleEmojiSelect = (event: CustomEvent) => {
-  formData.icon = event.detail.unicode
-  showEmojiPicker.value = false
-}
-
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  
+
   await formEl.validate((valid) => {
     if (valid) {
       // Set id equal to desc (item name)
       formData.id = formData.desc
-      
+
       if (isEdit.value) {
         const index = tableData.value.findIndex(item => item.id === formData.id)
         if (index !== -1) {
@@ -124,10 +117,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 }
 
 onMounted(() => {
-  const picker = document.querySelector('emoji-picker')
-  if (picker) {
-    picker.addEventListener('emoji-click', handleEmojiSelect as EventListener)
-  }
+
 })
 </script>
 
@@ -140,9 +130,9 @@ onMounted(() => {
           <el-button type="primary" @click="handleAdd">添加道具</el-button>
         </div>
       </template>
-      
+
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="icon" label="样式" width="100">
+        <el-table-column prop="icon" label="icon" width="100">
           <template #default="{ row }">
             <span class="item-icon">{{ row.icon }}</span>
           </template>
@@ -150,62 +140,28 @@ onMounted(() => {
         <el-table-column prop="desc" label="道具名称" />
         <el-table-column prop="value" label="出售价格">
           <template #default="{ row }">
-            {{ row.value }} 金币
+            {{ row.value }}💰️
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180">
           <template #default="{ row, $index }">
             <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button 
-              size="small" 
-              type="danger" 
-              @click="handleDelete($index)"
-            >删除</el-button>
+            <el-button size="small" type="danger" @click="handleDelete($index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
 
-    <el-dialog 
-      v-model="dialogVisible" 
-      :title="dialogTitle"
-      width="500px"
-    >
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="rules"
-        label-width="100px"
-      >
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
         <el-form-item label="道具名称" prop="desc">
-          <el-input 
-            v-model="formData.desc"
-            placeholder="请输入道具名称"
-          />
+          <el-input v-model="formData.desc" placeholder="请输入道具名称" />
         </el-form-item>
         <el-form-item label="样式" prop="icon">
-          <div class="emoji-input">
-            <el-input 
-              v-model="formData.icon"
-              readonly
-              placeholder="点击选择表情"
-              @click="showEmojiPicker = true"
-            >
-              <template #prefix>
-                <span v-if="formData.icon" class="selected-emoji">{{ formData.icon }}</span>
-              </template>
-            </el-input>
-            <div v-if="showEmojiPicker" class="emoji-picker-container">
-              <emoji-picker></emoji-picker>
-            </div>
-          </div>
+          <el-input v-model="formData.icon" placeholder="请输入样式" />
         </el-form-item>
         <el-form-item label="出售价格" prop="value">
-          <el-input-number 
-            v-model="formData.value"
-            :min="0"
-            placeholder="请输入出售价格"
-          />
+          <el-input-number v-model="formData.value" :min="0" placeholder="请输入出售价格" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -239,30 +195,5 @@ onMounted(() => {
 
 .item-icon {
   font-size: 1.5em;
-}
-
-.emoji-input {
-  position: relative;
-}
-
-.selected-emoji {
-  font-size: 1.2em;
-  margin-right: 8px;
-}
-
-.emoji-picker-container {
-  position: absolute;
-  z-index: 1000;
-  margin-top: 8px;
-}
-
-emoji-picker {
-  --background: var(--el-bg-color);
-  --border-color: var(--el-border-color);
-  --indicator-color: var(--el-color-primary);
-  --hover-background: var(--el-color-primary-light-9);
-  width: 100%;
-  max-width: 350px;
-  height: 400px;
 }
 </style>
