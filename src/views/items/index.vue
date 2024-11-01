@@ -13,13 +13,13 @@ const tableData = ref<ItemData[]>([
   {
     id: '铁剑',
     icon: '⚔️',
-    desc: '铁剑',
+    desc: '这是铁剑',
     value: 100
   },
   {
     id: '生命药水',
     icon: '🧪',
-    desc: '生命药水',
+    desc: '这是生命药水',
     value: 50
   }
 ])
@@ -37,8 +37,11 @@ const formData = reactive({
 })
 
 const rules = reactive<FormRules>({
-  desc: [
+  id: [
     { required: true, message: '请输入道具名称', trigger: 'blur' }
+  ],
+  desc: [
+    { required: true, message: '请输入道具描述', trigger: 'blur' }
   ],
   icon: [
     { required: true, message: '请输入emoji样式', trigger: 'blur' }
@@ -137,7 +140,7 @@ onMounted(() => {
             <span class="item-icon">{{ row.icon }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="desc" label="道具名称" />
+        <el-table-column prop="id" label="道具名称" />
         <el-table-column prop="value" label="出售价格">
           <template #default="{ row }">
             {{ row.value }}💰️
@@ -154,8 +157,11 @@ onMounted(() => {
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
-        <el-form-item label="道具名称" prop="desc">
-          <el-input v-model="formData.desc" placeholder="请输入道具名称" />
+        <el-form-item label="道具名称" prop="id">
+          <el-input  v-model="formData.id" placeholder="请输入道具描述" />
+        </el-form-item>
+        <el-form-item label="道具描述" prop="desc">
+          <el-input type="textarea" v-model="formData.desc" placeholder="请输入道具描述" />
         </el-form-item>
         <el-form-item label="样式" prop="icon">
           <el-input v-model="formData.icon" placeholder="请输入样式" />
